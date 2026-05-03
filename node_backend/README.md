@@ -43,7 +43,11 @@ Set with environment variables:
 - `FACILITATOR_URL` (same as above; use this if your deployment platform prefers a shorter env var name)
 - x402 payments are enforced for `base-sepolia` only
 - `EXECUTION_STALE_SECONDS` (default: `600`)
+ 
+Additional optional environment variables for integration:
 
+- `AXL_REGISTRY_URL` (optional): If set, the node will attempt to register a small set of service endpoints with the registry on startup and unregister them on shutdown. Example: `http://127.0.0.1:9003`.
+- `AXL_MCP_URL` (optional): The public MCP/endpoint URL that will be advertised to the registry for each service. Example: `https://my-node.example.com`.
 ## Run
 
 ```bash

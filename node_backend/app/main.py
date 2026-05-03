@@ -12,6 +12,7 @@ from uuid import uuid4
 import re
 import urllib.request
 import urllib.error
+import urllib.parse
 
 from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -1536,6 +1537,60 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# AXL registry integration: register services on startup and unregister on shutdown
+AXL_REGISTRY_URL = os.getenv("AXL_REGISTRY_URL")
+AXL_MCP_URL = os.getenv("AXL_MCP_URL")
+_registered_services: list[str] = []
+
+SERVICE_REGISTRY_MAP: dict[str, str] = {
+    "topology": "/topology",
+    "workstations": "/workstations",
+    "workflows": "/workflows",
+    "workflows_public": "/workflows/public",
+    "execute": "/execute",
+    "executions": "/executions",
+    "clipboard": "/clipboard",
+}
+
+def _axl_register(service_name: str, endpoint: str, registry_url: str) -> bool:
+    try:
+        payload = json.dumps({"service": service_name, "endpoint": endpoint}).encode("utf-8")
+        req = urllib.request.Request(f"{registry_url.rstrip('/')}/register", data=payload, headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            return True
+    except Exception as exc:
+        print(f"AXL register failed for {service_name}: {exc}")
+        return False
+
+
+def _axl_unregister(service_name: str, registry_url: str) -> bool:
+    try:
+        url = f"{registry_url.rstrip('/')}/register/{urllib.parse.quote(service_name, safe='')}"
+        req = urllib.request.Request(url, method="DELETE")
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            return True
+    except Exception as exc:
+        print(f"AXL unregister failed for {service_name}: {exc}")
+        return False
+
+
+@app.on_event("startup")
+def _axl_register_services_on_startup() -> None:
+    if not AXL_REGISTRY_URL or not AXL_MCP_URL:
+        return
+    for name in SERVICE_REGISTRY_MAP.keys():
+        success = _axl_register(name, AXL_MCP_URL, AXL_REGISTRY_URL)
+        if success:
+            _registered_services.append(name)
+
+
+@app.on_event("shutdown")
+def _axl_unregister_services_on_shutdown() -> None:
+    if not AXL_REGISTRY_URL:
+        return
+    for name in list(_registered_services):
+        _axl_unregister(name, AXL_REGISTRY_URL)
 
 
 @app.get("/health")

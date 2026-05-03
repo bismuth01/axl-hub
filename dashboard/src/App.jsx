@@ -28,6 +28,7 @@ function normalizeBaseUrl(value) {
 }
 
 const BASE_URL = normalizeBaseUrl(import.meta.env.VITE_NODE_BASE_URL);
+const PUBLIC_PEER_ID = import.meta.env.VITE_PUBLIC_PEER_ID || "";
 const REFRESH_INTERVAL_MS = 2500;
 
 function fmtTimestamp(value) {
@@ -386,7 +387,10 @@ function App() {
       <header className="hero">
         <p className="eyebrow">AXL HUB DEMO CONSOLE</p>
         <h1>Agent-first execution, discovery, and monetization</h1>
-        <p className="subtitle">Monitoring local node endpoints at {BASE_URL}</p>
+        <p className="subtitle">Monitoring node endpoints at {BASE_URL}</p>
+        {PUBLIC_PEER_ID && (
+          <p className="subtitle">Public Peer: {PUBLIC_PEER_ID}</p>
+        )}
       </header>
 
       <section className="stats-grid">

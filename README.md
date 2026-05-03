@@ -85,6 +85,7 @@ The dashboard polls the node endpoints on localhost and now acts as a small oper
 ### Frontend Config
 
 - `VITE_NODE_BASE_URL` (default `http://127.0.0.1:8000`)
+ - `VITE_PUBLIC_PEER_ID` (optional): Public peer id to show in the dashboard header for agent discovery and UX.
 
 ### Run Frontend
 
@@ -95,3 +96,5 @@ npm run dev
 ```
 
 Open `http://127.0.0.1:5173`.
+
+If deploying the dashboard and node to different hosts, set `VITE_NODE_BASE_URL` to point to the node and optionally set `VITE_PUBLIC_PEER_ID` so the dashboard displays the node's public peer id.
