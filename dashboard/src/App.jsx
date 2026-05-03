@@ -1,6 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 
-const BASE_URL = import.meta.env.VITE_NODE_BASE_URL || "http://127.0.0.1:8000";
+function normalizeBaseUrl(value) {
+  const fallback = "http://127.0.0.1:8000";
+  const raw = String(value || fallback).trim().replace(/\/+$/, "");
+
+  if (/^https?:\/\//i.test(raw)) {
+    return raw;
+  }
+
+  if (raw.startsWith("//")) {
+    const protocol = typeof window !== "undefined" ? window.location.protocol : "http:";
+    return `${protocol}${raw}`;
+  }
+
+  return `http://${raw}`;
+}
+
+const BASE_URL = normalizeBaseUrl(import.meta.env.VITE_NODE_BASE_URL);
 const REFRESH_INTERVAL_MS = 2500;
 
 function fmtTimestamp(value) {
