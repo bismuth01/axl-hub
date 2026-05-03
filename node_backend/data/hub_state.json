@@ -1,6 +1,903 @@
 {
   "clipboard": [],
   "executions": {
+    "02188587259b4863ab1d97d7fcc734e7": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T12:19:05.130559+00:00",
+      "id": "02188587259b4863ab1d97d7fcc734e7",
+      "input": {},
+      "logs": [
+        {
+          "node": "step1",
+          "output": {
+            "price": 65432.5
+          }
+        },
+        {
+          "node": "step2",
+          "output": {
+            "message_id": "msg_9ec7867d",
+            "recipient": "siddharthaswarnkar@gmail.com",
+            "success": true
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [
+        {
+          "node": "step1",
+          "proof": "947ab7b9fa4f47ed886d9bc0c80efd44"
+        },
+        {
+          "node": "step2",
+          "proof": "53b971a7ee814a199b7dd5c4bb7841dd"
+        }
+      ],
+      "root_graph": {
+        "edges": [
+          {
+            "condition": "true",
+            "from_id": "step1",
+            "to_id": "step2"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "step1",
+            "on_failure": null,
+            "params": {
+              "coin": "btc"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          },
+          {
+            "id": "step2",
+            "on_failure": null,
+            "params": {
+              "content": "$node.step1.output.price",
+              "email": "siddharthaswarnkar@gmail.com"
+            },
+            "retry": null,
+            "workflow_id": "email-send"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
+    "42df922a934e4c92a1f769632efad77a": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T12:02:41.124362+00:00",
+      "id": "42df922a934e4c92a1f769632efad77a",
+      "input": {},
+      "logs": [
+        {
+          "node": "1",
+          "result": {
+            "error": "HTTP Error 403: Forbidden",
+            "status": "failed"
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [],
+      "root_graph": {
+        "edges": [],
+        "nodes": [
+          {
+            "id": "1",
+            "on_failure": null,
+            "params": {
+              "coin": "eth"
+            },
+            "retry": null,
+            "workflow_id": "test"
+          }
+        ]
+      },
+      "status": "failed",
+      "workstation_id": null
+    },
+    "43f88c2c995a448a95447e0bc43da17a": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T10:31:03.585218+00:00",
+      "id": "43f88c2c995a448a95447e0bc43da17a",
+      "input": {},
+      "logs": [
+        {
+          "node": "A",
+          "result": {
+            "error": "<urlopen error [Errno 111] Connection refused>",
+            "status": "failed"
+          }
+        },
+        {
+          "fallback": "B",
+          "node": "A"
+        },
+        {
+          "node": "B",
+          "output": {
+            "result": "fallback-ok"
+          }
+        }
+      ],
+      "output": null,
+      "payment": [
+        {
+          "action": "reserve",
+          "amount": "1",
+          "node": "A",
+          "recipient": "r1",
+          "reservation_id": "894a8ba08a95441db49aea47c82236ff",
+          "token": "USDC"
+        },
+        {
+          "action": "reserve",
+          "amount": "2",
+          "node": "B",
+          "recipient": "r2",
+          "reservation_id": "6dedea8a8ada499eb3078f48e270c2ca",
+          "token": "USDC"
+        },
+        {
+          "action": "release",
+          "node": "A",
+          "reservation_id": "894a8ba08a95441db49aea47c82236ff"
+        },
+        {
+          "action": "settle",
+          "node": "B",
+          "reservation_id": "6dedea8a8ada499eb3078f48e270c2ca",
+          "settlement_id": "1a6e6a8bdb0c408b8658d91c114278a7"
+        }
+      ],
+      "payment_reservations": {
+        "A": "894a8ba08a95441db49aea47c82236ff",
+        "B": "6dedea8a8ada499eb3078f48e270c2ca"
+      },
+      "payment_status": {
+        "A": "released",
+        "B": "settled"
+      },
+      "proofs": [],
+      "root_graph": {
+        "edges": [
+          {
+            "condition": "true",
+            "from_id": "A",
+            "to_id": "B"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "A",
+            "on_failure": "B",
+            "params": {
+              "seed": 1
+            },
+            "retry": null,
+            "workflow_id": "wf-fail"
+          },
+          {
+            "id": "B",
+            "on_failure": null,
+            "params": {
+              "result": "fallback-ok"
+            },
+            "retry": null,
+            "workflow_id": "wf-fallback"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
+    "4dc4bd03a50c46e29aa7e6e1aa677390": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T11:37:42.992812+00:00",
+      "id": "4dc4bd03a50c46e29aa7e6e1aa677390",
+      "input": {},
+      "logs": [
+        {
+          "node": "1",
+          "output": {
+            "coin": "BTC"
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [
+        {
+          "node": "1",
+          "proof": "3ca2ec7851aa4bd481dffe2986e136b3"
+        }
+      ],
+      "root_graph": {
+        "edges": [],
+        "nodes": [
+          {
+            "id": "1",
+            "on_failure": null,
+            "params": {
+              "coin": "BTC"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
+    "59f364188f63456eac5be7c64a18ba20": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T11:54:16.810164+00:00",
+      "id": "59f364188f63456eac5be7c64a18ba20",
+      "input": {},
+      "logs": [
+        {
+          "node": "A",
+          "output": {
+            "coin": "btc",
+            "seed": 1
+          }
+        },
+        {
+          "node": "B",
+          "result": {
+            "error": "HTTP Error 403: Forbidden",
+            "status": "failed"
+          }
+        }
+      ],
+      "output": null,
+      "payment": [
+        {
+          "action": "reserve",
+          "amount": "2",
+          "node": "A",
+          "recipient": "r2",
+          "reservation_id": "4665be91494c4412aa84772d84e270c1",
+          "token": "USDC"
+        },
+        {
+          "action": "settle",
+          "node": "A",
+          "reservation_id": "4665be91494c4412aa84772d84e270c1",
+          "settlement_id": "cd8da0fa0b154d67a0953e2b5a36aa8d"
+        }
+      ],
+      "payment_reservations": {
+        "A": "4665be91494c4412aa84772d84e270c1"
+      },
+      "payment_status": {
+        "A": "settled"
+      },
+      "proofs": [],
+      "root_graph": {
+        "edges": [
+          {
+            "condition": "true",
+            "from_id": "A",
+            "to_id": "B"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "A",
+            "on_failure": "B",
+            "params": {
+              "seed": 1
+            },
+            "retry": null,
+            "workflow_id": "wf-fallback"
+          },
+          {
+            "id": "B",
+            "on_failure": null,
+            "params": {
+              "coin": "btc"
+            },
+            "retry": null,
+            "workflow_id": "test"
+          }
+        ]
+      },
+      "status": "failed",
+      "workstation_id": null
+    },
+    "605bc1d8df364eafa9f982c15075782b": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T12:01:22.740008+00:00",
+      "id": "605bc1d8df364eafa9f982c15075782b",
+      "input": {},
+      "logs": [
+        {
+          "node": "A",
+          "result": {
+            "error": "<urlopen error [Errno 111] Connection refused>",
+            "status": "failed"
+          }
+        },
+        {
+          "fallback": "B",
+          "node": "A"
+        },
+        {
+          "node": "B",
+          "result": {
+            "error": "coin parameter required",
+            "status": "failed"
+          }
+        }
+      ],
+      "output": null,
+      "payment": [
+        {
+          "action": "reserve",
+          "amount": "1",
+          "node": "A",
+          "recipient": "r1",
+          "reservation_id": "771b63144e9946bdbb18dd1dbf1b08cc",
+          "token": "USDC"
+        },
+        {
+          "action": "release",
+          "node": "A",
+          "reservation_id": "771b63144e9946bdbb18dd1dbf1b08cc"
+        }
+      ],
+      "payment_reservations": {
+        "A": "771b63144e9946bdbb18dd1dbf1b08cc"
+      },
+      "payment_status": {
+        "A": "released"
+      },
+      "proofs": [],
+      "root_graph": {
+        "edges": [
+          {
+            "condition": "true",
+            "from_id": "A",
+            "to_id": "B"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "A",
+            "on_failure": "B",
+            "params": {
+              "seed": 1
+            },
+            "retry": null,
+            "workflow_id": "wf-fail"
+          },
+          {
+            "id": "B",
+            "on_failure": null,
+            "params": {
+              "result": "fallback-ok"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          }
+        ]
+      },
+      "status": "failed",
+      "workstation_id": null
+    },
+    "639431bd8c5c46fb92fad0e3eb59fed8": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T11:46:29.426091+00:00",
+      "id": "639431bd8c5c46fb92fad0e3eb59fed8",
+      "input": {},
+      "logs": [
+        {
+          "node": "test_node",
+          "result": {
+            "error": "HTTP Error 403: Forbidden",
+            "status": "failed"
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [],
+      "root_graph": {
+        "edges": [],
+        "nodes": [
+          {
+            "id": "test_node",
+            "on_failure": null,
+            "params": {
+              "symbol": "eth"
+            },
+            "retry": null,
+            "workflow_id": "test"
+          }
+        ]
+      },
+      "status": "failed",
+      "workstation_id": null
+    },
+    "82a057a9a7ce4465bf0f25357c5dce89": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T12:26:06.243541+00:00",
+      "id": "82a057a9a7ce4465bf0f25357c5dce89",
+      "input": {},
+      "logs": [
+        {
+          "node": "step1",
+          "output": {
+            "price": 65432.5
+          }
+        },
+        {
+          "node": "step2",
+          "output": {
+            "message_id": "msg_0a92a6d9",
+            "recipient": "siddharthaswarnkar@gmail.com",
+            "success": true
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [
+        {
+          "node": "step1",
+          "proof": "80fd51ca1b5d4f3184df19fbe7da1069"
+        },
+        {
+          "node": "step2",
+          "proof": "8df1b04d93c14a549409a90cfcfd97fd"
+        }
+      ],
+      "root_graph": {
+        "edges": [
+          {
+            "condition": "true",
+            "from_id": "step1",
+            "to_id": "step2"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "step1",
+            "on_failure": null,
+            "params": {
+              "coin": "btc"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          },
+          {
+            "id": "step2",
+            "on_failure": null,
+            "params": {
+              "content": "$node.step1.output",
+              "email": "siddharthaswarnkar@gmail.com"
+            },
+            "retry": null,
+            "workflow_id": "email-send"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
+    "87e1b8e7ea1f47a0b813a0340cf31d84": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T11:46:50.523889+00:00",
+      "id": "87e1b8e7ea1f47a0b813a0340cf31d84",
+      "input": {},
+      "logs": [
+        {
+          "node": "A",
+          "result": {
+            "error": "HTTP Error 403: Forbidden",
+            "status": "failed"
+          }
+        },
+        {
+          "fallback": "B",
+          "node": "A"
+        },
+        {
+          "node": "B",
+          "output": {
+            "result": "fallback-ok"
+          }
+        }
+      ],
+      "output": null,
+      "payment": [
+        {
+          "action": "reserve",
+          "amount": "2",
+          "node": "B",
+          "recipient": "r2",
+          "reservation_id": "23e4049b6156402dafed2d3d729ff759",
+          "token": "USDC"
+        },
+        {
+          "action": "settle",
+          "node": "B",
+          "reservation_id": "23e4049b6156402dafed2d3d729ff759",
+          "settlement_id": "7e7689ef6c0d4ad7b18e8cc74822ed12"
+        }
+      ],
+      "payment_reservations": {
+        "B": "23e4049b6156402dafed2d3d729ff759"
+      },
+      "payment_status": {
+        "B": "settled"
+      },
+      "proofs": [],
+      "root_graph": {
+        "edges": [
+          {
+            "condition": "true",
+            "from_id": "A",
+            "to_id": "B"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "A",
+            "on_failure": "B",
+            "params": {
+              "coin": "btc"
+            },
+            "retry": null,
+            "workflow_id": "test"
+          },
+          {
+            "id": "B",
+            "on_failure": null,
+            "params": {
+              "result": "fallback-ok"
+            },
+            "retry": null,
+            "workflow_id": "wf-fallback"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
+    "899e4bcf3ace4d4d935f21479f16670c": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T12:00:24.129760+00:00",
+      "id": "899e4bcf3ace4d4d935f21479f16670c",
+      "input": {},
+      "logs": [
+        {
+          "node": "1",
+          "output": {
+            "price": 3421.75
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [
+        {
+          "node": "1",
+          "proof": "1dac936a70704ae4a24a4769230cc41b"
+        }
+      ],
+      "root_graph": {
+        "edges": [],
+        "nodes": [
+          {
+            "id": "1",
+            "on_failure": null,
+            "params": {
+              "coin": "eth"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
+    "aa45365b9757439cbb8e104df154fba6": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T12:00:24.165719+00:00",
+      "id": "aa45365b9757439cbb8e104df154fba6",
+      "input": {},
+      "logs": [
+        {
+          "node": "1",
+          "output": {
+            "price": 28.45
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [
+        {
+          "node": "1",
+          "proof": "d30bc6b8eb1e4bb6809fa2f37bc6d4de"
+        }
+      ],
+      "root_graph": {
+        "edges": [],
+        "nodes": [
+          {
+            "id": "1",
+            "on_failure": null,
+            "params": {
+              "coin": "link"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
+    "b6839622d9834f10ae798a0dd8d646a6": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T11:45:38.327133+00:00",
+      "id": "b6839622d9834f10ae798a0dd8d646a6",
+      "input": {},
+      "logs": [
+        {
+          "node": "test_node",
+          "result": {
+            "error": "HTTP Error 403: Forbidden",
+            "status": "failed"
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [],
+      "root_graph": {
+        "edges": [],
+        "nodes": [
+          {
+            "id": "test_node",
+            "on_failure": null,
+            "params": {},
+            "retry": null,
+            "workflow_id": "test"
+          }
+        ]
+      },
+      "status": "failed",
+      "workstation_id": null
+    },
+    "ba464a3c588d427fb9abd475830cd9e8": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T12:01:47.500822+00:00",
+      "id": "ba464a3c588d427fb9abd475830cd9e8",
+      "input": {},
+      "logs": [
+        {
+          "node": "A",
+          "result": {
+            "error": "<urlopen error [Errno 111] Connection refused>",
+            "status": "failed"
+          }
+        },
+        {
+          "fallback": "B",
+          "node": "A"
+        },
+        {
+          "node": "B",
+          "output": {
+            "price": 65432.5
+          }
+        }
+      ],
+      "output": null,
+      "payment": [
+        {
+          "action": "reserve",
+          "amount": "1",
+          "node": "A",
+          "recipient": "r1",
+          "reservation_id": "9f6b5e93c1dc4cc2bb1a582ccce20ca7",
+          "token": "USDC"
+        },
+        {
+          "action": "release",
+          "node": "A",
+          "reservation_id": "9f6b5e93c1dc4cc2bb1a582ccce20ca7"
+        }
+      ],
+      "payment_reservations": {
+        "A": "9f6b5e93c1dc4cc2bb1a582ccce20ca7"
+      },
+      "payment_status": {
+        "A": "released"
+      },
+      "proofs": [
+        {
+          "node": "B",
+          "proof": "74f9ac22cdac4eee8b5d33ca4a217994"
+        }
+      ],
+      "root_graph": {
+        "edges": [
+          {
+            "condition": "true",
+            "from_id": "A",
+            "to_id": "B"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "A",
+            "on_failure": "B",
+            "params": {
+              "seed": 1
+            },
+            "retry": null,
+            "workflow_id": "wf-fail"
+          },
+          {
+            "id": "B",
+            "on_failure": null,
+            "params": {
+              "coin": "btc"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
+    "d77c1d95297544228a61a406e4fcc4c1": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T12:00:28.890180+00:00",
+      "id": "d77c1d95297544228a61a406e4fcc4c1",
+      "input": {},
+      "logs": [
+        {
+          "node": "1",
+          "result": {
+            "error": "unsupported coin: xrp",
+            "status": "failed"
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [],
+      "root_graph": {
+        "edges": [],
+        "nodes": [
+          {
+            "id": "1",
+            "on_failure": null,
+            "params": {
+              "coin": "xrp"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          }
+        ]
+      },
+      "status": "failed",
+      "workstation_id": null
+    },
+    "de6d05900aa140d4920b7918d9608a91": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T12:16:24.643966+00:00",
+      "id": "de6d05900aa140d4920b7918d9608a91",
+      "input": {},
+      "logs": [
+        {
+          "node": "A",
+          "output": {
+            "price": 65432.5
+          }
+        },
+        {
+          "node": "B",
+          "output": {
+            "message_id": "msg_495bf790",
+            "recipient": "siddharthaswarnkar@gmail.com",
+            "success": true
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [
+        {
+          "node": "A",
+          "proof": "c3f8dbca9394442f8e22c51a4fe2a93e"
+        },
+        {
+          "node": "B",
+          "proof": "deee96a6949f4f12ae816a9af4ea7587"
+        }
+      ],
+      "root_graph": {
+        "edges": [
+          {
+            "condition": "true",
+            "from_id": "A",
+            "to_id": "B"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "A",
+            "on_failure": null,
+            "params": {
+              "coin": "btc"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          },
+          {
+            "id": "B",
+            "on_failure": null,
+            "params": {
+              "content": "$node.A.output.price",
+              "email": "siddharthaswarnkar@gmail.com"
+            },
+            "retry": null,
+            "workflow_id": "email-send"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
     "deb4e639d75446a4be6d32d42a8e5052": {
       "actor_id": null,
       "completed_at": null,
@@ -96,10 +993,476 @@
       },
       "status": "completed",
       "workstation_id": null
+    },
+    "e07279933d694bf2b11e4feeea13988e": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T12:18:01.875391+00:00",
+      "id": "e07279933d694bf2b11e4feeea13988e",
+      "input": {},
+      "logs": [
+        {
+          "error": "workflow not found",
+          "node": "step2"
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [],
+      "root_graph": {
+        "edges": [
+          {
+            "condition": "true",
+            "from_id": "step1",
+            "to_id": "step2"
+          },
+          {
+            "condition": "true",
+            "from_id": "step2",
+            "to_id": "step3"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "step1",
+            "on_failure": null,
+            "params": {
+              "coin": "btc"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          },
+          {
+            "id": "step2",
+            "on_failure": null,
+            "params": {
+              "price": "$node.step1.output.price"
+            },
+            "retry": null,
+            "workflow_id": "some-processor"
+          },
+          {
+            "id": "step3",
+            "on_failure": null,
+            "params": {
+              "content": "$node.step2.output.processed_data",
+              "email": "user@example.com"
+            },
+            "retry": null,
+            "workflow_id": "email-send"
+          }
+        ]
+      },
+      "status": "failed",
+      "workstation_id": null
+    },
+    "ed6319919b1b4d8190f845b30026fc43": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T11:59:48.190648+00:00",
+      "id": "ed6319919b1b4d8190f845b30026fc43",
+      "input": {},
+      "logs": [
+        {
+          "node": "1",
+          "output": {
+            "price": 65432.5
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [
+        {
+          "node": "1",
+          "proof": "fd7d32275fdb4ba2bac89039a17176f7"
+        }
+      ],
+      "root_graph": {
+        "edges": [],
+        "nodes": [
+          {
+            "id": "1",
+            "on_failure": null,
+            "params": {
+              "coin": "btc"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
+    "ef352f0fdb79421cbb8cd85ff69a515e": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T12:03:02.803261+00:00",
+      "id": "ef352f0fdb79421cbb8cd85ff69a515e",
+      "input": {},
+      "logs": [
+        {
+          "node": "1",
+          "output": {
+            "price": 3421.75
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [
+        {
+          "node": "1",
+          "proof": "7ce43b0ea31947c6839aa307ed28c0fd"
+        }
+      ],
+      "root_graph": {
+        "edges": [],
+        "nodes": [
+          {
+            "id": "1",
+            "on_failure": null,
+            "params": {
+              "coin": "eth"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
+    "f74f74de278a41808e92e8c0658ff8c0": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T12:00:18.015677+00:00",
+      "id": "f74f74de278a41808e92e8c0658ff8c0",
+      "input": {},
+      "logs": [
+        {
+          "node": "node1",
+          "output": {
+            "price": 65432.5
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [
+        {
+          "node": "node1",
+          "proof": "5ce32c8dd5dd4efa8df5d9733fbb5e2c"
+        }
+      ],
+      "root_graph": {
+        "edges": [],
+        "nodes": [
+          {
+            "id": "node1",
+            "on_failure": null,
+            "params": {
+              "coin": "btc"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
+    "f7bcf23b147042c3a45fc6975dc5e3ca": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T11:38:55.486260+00:00",
+      "id": "f7bcf23b147042c3a45fc6975dc5e3ca",
+      "input": {},
+      "logs": [
+        {
+          "node": "A",
+          "output": {
+            "coin": "btc",
+            "seed": 1
+          }
+        },
+        {
+          "node": "B",
+          "output": {
+            "result": "fallback-ok"
+          }
+        }
+      ],
+      "output": null,
+      "payment": [
+        {
+          "action": "reserve",
+          "amount": "2",
+          "node": "B",
+          "recipient": "r2",
+          "reservation_id": "697fde901f3b485cb104c68f933224a7",
+          "token": "USDC"
+        },
+        {
+          "action": "settle",
+          "node": "B",
+          "reservation_id": "697fde901f3b485cb104c68f933224a7",
+          "settlement_id": "0ab8b8d5eb8d453383f53c845a849776"
+        }
+      ],
+      "payment_reservations": {
+        "B": "697fde901f3b485cb104c68f933224a7"
+      },
+      "payment_status": {
+        "B": "settled"
+      },
+      "proofs": [
+        {
+          "node": "A",
+          "proof": "595b29aa773d4195b031b1644a2df203"
+        }
+      ],
+      "root_graph": {
+        "edges": [
+          {
+            "condition": "true",
+            "from_id": "A",
+            "to_id": "B"
+          }
+        ],
+        "nodes": [
+          {
+            "id": "A",
+            "on_failure": "B",
+            "params": {
+              "coin": "btc"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          },
+          {
+            "id": "B",
+            "on_failure": null,
+            "params": {
+              "result": "fallback-ok"
+            },
+            "retry": null,
+            "workflow_id": "wf-fallback"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
+    "fae1c58352344dd4a0ea930b0a3b8897": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T11:04:15.007214+00:00",
+      "id": "fae1c58352344dd4a0ea930b0a3b8897",
+      "input": {},
+      "logs": [
+        {
+          "node": "1",
+          "output": {
+            "coin": "BTC"
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [
+        {
+          "node": "1",
+          "proof": "a90a3bee0abb494bbd54c2952b2008b2"
+        }
+      ],
+      "root_graph": {
+        "edges": [],
+        "nodes": [
+          {
+            "id": "1",
+            "on_failure": null,
+            "params": {},
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
+    },
+    "fc2216d5cefb4683a29213d0f6f85c06": {
+      "actor_id": null,
+      "completed_at": null,
+      "created_at": "2026-05-03T12:00:24.147898+00:00",
+      "id": "fc2216d5cefb4683a29213d0f6f85c06",
+      "input": {},
+      "logs": [
+        {
+          "node": "1",
+          "output": {
+            "price": 1.0
+          }
+        }
+      ],
+      "output": null,
+      "payment": [],
+      "payment_reservations": {},
+      "payment_status": {},
+      "proofs": [
+        {
+          "node": "1",
+          "proof": "0371218153af41ceb5cfe523a3e8eff4"
+        }
+      ],
+      "root_graph": {
+        "edges": [],
+        "nodes": [
+          {
+            "id": "1",
+            "on_failure": null,
+            "params": {
+              "coin": "dai"
+            },
+            "retry": null,
+            "workflow_id": "chainlink-price-fetcher"
+          }
+        ]
+      },
+      "status": "completed",
+      "workstation_id": null
     }
   },
   "participants": {},
   "workflows": {
+    "chainlink-price-fetcher": {
+      "created_at": "2026-05-03T11:03:37.956016+00:00",
+      "description": "Get price from eth mainnet of coins in USD. (Only supports btc, eth, dai, link)",
+      "endpoint": null,
+      "execution_type": "keeperhub",
+      "id": "chainlink-price-fetcher",
+      "input_schema": {
+        "properties": {
+          "coin": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "metadata": {
+        "category": "ops",
+        "tags": [
+          "demo",
+          "price",
+          "btc",
+          "eth",
+          "link",
+          "dai"
+        ]
+      },
+      "name": "Chainlink coin price fetcher",
+      "output_schema": {
+        "properties": {
+          "price": {
+            "type": "float"
+          }
+        },
+        "type": "object"
+      },
+      "owner_id": "agent-owner",
+      "pricing": {
+        "enabled": false,
+        "x402": {
+          "price": "1.00",
+          "recipient": "0x0000000000000000000000000000000000000000",
+          "token": "USDC"
+        }
+      },
+      "updated_at": "2026-05-03T11:03:37.956016+00:00",
+      "visibility": "public"
+    },
+    "email-send": {
+      "created_at": "2026-05-03T12:13:34.538427+00:00",
+      "description": "Send an Email",
+      "endpoint": null,
+      "execution_type": "keeperhub",
+      "id": "email-send",
+      "input_schema": {
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "metadata": {},
+      "name": "Email Send",
+      "output_schema": {
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "owner_id": "agent-owner",
+      "pricing": {
+        "enabled": false,
+        "x402": {
+          "price": "1.00",
+          "recipient": "0x0000000000000000000000000000000000000000",
+          "token": "USDC"
+        }
+      },
+      "updated_at": "2026-05-03T12:13:34.538427+00:00",
+      "visibility": "public"
+    },
+    "test": {
+      "created_at": "2026-05-03T11:44:06.554473+00:00",
+      "description": "Get chainlink price in USD (only btc, eth, dai and link supported, all smallcaps)",
+      "endpoint": "https://app.keeperhub.com/api/workflows/jquemgv2ah91wkjd2xdcs/webhook",
+      "execution_type": "http",
+      "id": "test",
+      "input_schema": {
+        "coin": "string"
+      },
+      "metadata": {},
+      "name": "test",
+      "output_schema": {
+        "price": "float"
+      },
+      "owner_id": "agent-owner",
+      "pricing": {
+        "enabled": false,
+        "x402": {
+          "price": "1.00",
+          "recipient": "0x0000000000000000000000000000000000000000",
+          "token": "USDC"
+        }
+      },
+      "updated_at": "2026-05-03T11:44:06.554473+00:00",
+      "visibility": "public"
+    },
     "wf-fail": {
       "created_at": "2026-05-02T15:36:41.037402+00:00",
       "description": null,

@@ -319,6 +319,39 @@ td {
   cursor: not-allowed;
 }
 
+.error-summary {
+  grid-column: 1 / -1;
+  background: #fee;
+  border: 1px solid var(--danger);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.error-summary p {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.92rem;
+  color: var(--danger);
+}
+
+.error-summary ul {
+  margin: 0;
+  padding-left: 1.5rem;
+  font-size: 0.88rem;
+  color: var(--danger);
+}
+
+.error-summary li {
+  margin: 0.25rem 0;
+}
+
+.field-error {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--danger);
+  margin-top: 0.25rem;
+}
+
 .execution-detail {
   display: grid;
   gap: 0.85rem;

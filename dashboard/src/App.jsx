@@ -69,6 +69,10 @@ function App() {
     output_schema: "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"result\": {\n      \"type\": \"string\"\n    }\n  }\n}",
     execution_type: "local",
     endpoint: "",
+    method: "POST",
+    headers: "",
+    body_template: "",
+    workflow_id: "",
     owner_id: "agent-owner",
     visibility: "public",
     pricing_enabled: true,
@@ -76,6 +80,8 @@ function App() {
     token: "USDC",
     recipient: "0x0000000000000000000000000000000000000000",
   });
+
+  const [workflowFormErrors, setWorkflowFormErrors] = useState({});
 
   const [executionForm, setExecutionForm] = useState({
     actor_id: "agent-1",
@@ -153,8 +159,63 @@ function App() {
     return total / publicWorkflows.length;
   }, [publicWorkflows]);
 
+  // Validation function for workflow form based on execution_type
+  const validateWorkflowForm = () => {
+    const errors = {};
+    const { execution_type, id, name, endpoint, workflow_id } = workflowForm;
+
+    if (!id || !id.trim()) {
+      errors.id = "Workflow ID is required";
+    }
+    if (!name || !name.trim()) {
+      errors.name = "Name is required";
+    }
+
+    if (execution_type === "http") {
+      if (!endpoint || !endpoint.trim()) {
+        errors.endpoint = "Endpoint is required for HTTP workflows";
+      }
+    } else if (execution_type === "keeperhub") {
+      if (!workflow_id || !workflow_id.trim()) {
+        errors.workflow_id = "Workflow ID is required for KeeperHub workflows";
+      }
+    }
+
+    setWorkflowFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Clean up irrelevant fields when execution_type changes
+  const handleExecutionTypeChange = (newType) => {
+    const cleaned = { ...workflowForm, execution_type: newType };
+
+    if (newType === "local") {
+      cleaned.endpoint = "";
+      cleaned.method = "POST";
+      cleaned.headers = "";
+      cleaned.body_template = "";
+      cleaned.workflow_id = "";
+    } else if (newType === "http") {
+      cleaned.workflow_id = "";
+    } else if (newType === "keeperhub") {
+      cleaned.endpoint = "";
+      cleaned.method = "POST";
+      cleaned.headers = "";
+      cleaned.body_template = "";
+    }
+
+    setWorkflowForm(cleaned);
+    setWorkflowFormErrors({});
+  };
+
   const handleCreateWorkflow = async (event) => {
     event.preventDefault();
+
+    // Validate before submitting
+    if (!validateWorkflowForm()) {
+      return;
+    }
+
     setWorkflowSubmitting(true);
     setError("");
 
@@ -167,7 +228,6 @@ function App() {
         input_schema: parseJson(workflowForm.input_schema, {}),
         output_schema: parseJson(workflowForm.output_schema, {}),
         execution_type: workflowForm.execution_type,
-        endpoint: workflowForm.endpoint.trim() || null,
         owner_id: workflowForm.owner_id.trim(),
         visibility: workflowForm.visibility,
         pricing: {
@@ -179,6 +239,21 @@ function App() {
           },
         },
       };
+
+      // Shape payload based on execution_type
+      if (workflowForm.execution_type === "http") {
+        payload.endpoint = workflowForm.endpoint.trim();
+        if (workflowForm.method) payload.method = workflowForm.method;
+        if (workflowForm.headers?.trim()) {
+          payload.headers = parseJson(workflowForm.headers, {});
+        }
+        if (workflowForm.body_template?.trim()) {
+          payload.body_template = workflowForm.body_template.trim();
+        }
+      } else if (workflowForm.execution_type === "keeperhub") {
+        payload.workflow_id = workflowForm.workflow_id.trim();
+      }
+      // local workflows: no execution-specific fields needed
 
       const response = await fetch(`${BASE_URL}/workflows`, {
         method: "POST",
@@ -192,6 +267,29 @@ function App() {
 
       const created = await response.json();
       setPublicWorkflows((current) => [{ ...created, usage_count: 0, success_rate: 0 }, ...current]);
+      
+      // Reset form after successful creation
+      setWorkflowForm({
+        id: "",
+        name: "",
+        description: "",
+        metadata: "{}",
+        input_schema: "{}",
+        output_schema: "{}",
+        execution_type: "local",
+        endpoint: "",
+        method: "POST",
+        headers: "",
+        body_template: "",
+        workflow_id: "",
+        owner_id: "agent-owner",
+        visibility: "public",
+        pricing_enabled: true,
+        price: "1.00",
+        token: "USDC",
+        recipient: "0x0000000000000000000000000000000000000000",
+      });
+      setWorkflowFormErrors({});
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create workflow");
     } finally {
@@ -323,14 +421,30 @@ function App() {
 
         <section className="panel">
           <h2>Create Workflow</h2>
+          {Object.keys(workflowFormErrors).length > 0 && (
+            <div className="error-summary">
+              <p>
+                <strong>Please fix the following errors:</strong>
+              </p>
+              <ul>
+                {Object.entries(workflowFormErrors).map(([field, message]) => (
+                  <li key={field}>
+                    {field}: {message}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           <form className="form-grid" onSubmit={handleCreateWorkflow}>
             <label className="field">
               <span>Workflow ID</span>
               <input value={workflowForm.id} onChange={(e) => setWorkflowForm({ ...workflowForm, id: e.target.value })} />
+              {workflowFormErrors.id && <span className="field-error">{workflowFormErrors.id}</span>}
             </label>
             <label className="field">
               <span>Name</span>
               <input value={workflowForm.name} onChange={(e) => setWorkflowForm({ ...workflowForm, name: e.target.value })} />
+              {workflowFormErrors.name && <span className="field-error">{workflowFormErrors.name}</span>}
             </label>
             <label className="field field-wide">
               <span>Description</span>
@@ -349,16 +463,70 @@ function App() {
             </label>
             <label className="field">
               <span>Execution Type</span>
-              <select value={workflowForm.execution_type} onChange={(e) => setWorkflowForm({ ...workflowForm, execution_type: e.target.value })}>
-                <option value="local">local</option>
-                <option value="http">http</option>
-                <option value="keeperhub">keeperhub</option>
+              <select value={workflowForm.execution_type} onChange={(e) => handleExecutionTypeChange(e.target.value)}>
+                <option value="local">local (echo, no external calls)</option>
+                <option value="http">http (external REST endpoint)</option>
+                <option value="keeperhub">keeperhub (on-chain execution)</option>
               </select>
             </label>
-            <label className="field">
-              <span>Endpoint</span>
-              <input value={workflowForm.endpoint} onChange={(e) => setWorkflowForm({ ...workflowForm, endpoint: e.target.value })} />
-            </label>
+
+            {/* HTTP-specific fields */}
+            {workflowForm.execution_type === "http" && (
+              <>
+                <label className="field">
+                  <span>Endpoint *</span>
+                  <input
+                    value={workflowForm.endpoint}
+                    onChange={(e) => setWorkflowForm({ ...workflowForm, endpoint: e.target.value })}
+                    placeholder="https://api.example.com/execute"
+                  />
+                  {workflowFormErrors.endpoint && <span className="field-error">{workflowFormErrors.endpoint}</span>}
+                </label>
+                <label className="field">
+                  <span>HTTP Method</span>
+                  <select value={workflowForm.method} onChange={(e) => setWorkflowForm({ ...workflowForm, method: e.target.value })}>
+                    <option value="GET">GET</option>
+                    <option value="POST">POST</option>
+                    <option value="PUT">PUT</option>
+                    <option value="PATCH">PATCH</option>
+                  </select>
+                </label>
+                <label className="field field-wide">
+                  <span>Headers (optional JSON)</span>
+                  <textarea
+                    rows="3"
+                    value={workflowForm.headers}
+                    onChange={(e) => setWorkflowForm({ ...workflowForm, headers: e.target.value })}
+                    placeholder='{"Authorization": "Bearer token", "X-Custom": "value"}'
+                  />
+                </label>
+                <label className="field field-wide">
+                  <span>Body Template (optional)</span>
+                  <textarea
+                    rows="3"
+                    value={workflowForm.body_template}
+                    onChange={(e) => setWorkflowForm({ ...workflowForm, body_template: e.target.value })}
+                    placeholder='{"query": "${input.seed}", "format": "json"}'
+                  />
+                </label>
+              </>
+            )}
+
+            {/* KeeperHub-specific fields */}
+            {workflowForm.execution_type === "keeperhub" && (
+              <>
+                <label className="field">
+                  <span>Workflow ID / Job Identifier *</span>
+                  <input
+                    value={workflowForm.workflow_id}
+                    onChange={(e) => setWorkflowForm({ ...workflowForm, workflow_id: e.target.value })}
+                    placeholder="keeperhub-workflow-id"
+                  />
+                  {workflowFormErrors.workflow_id && <span className="field-error">{workflowFormErrors.workflow_id}</span>}
+                </label>
+              </>
+            )}
+
             <label className="field field-wide">
               <span>Metadata JSON</span>
               <textarea rows="4" value={workflowForm.metadata} onChange={(e) => setWorkflowForm({ ...workflowForm, metadata: e.target.value })} />
@@ -389,7 +557,11 @@ function App() {
               <span>Recipient</span>
               <input value={workflowForm.recipient} onChange={(e) => setWorkflowForm({ ...workflowForm, recipient: e.target.value })} />
             </label>
-            <button className="primary-button" type="submit" disabled={workflowSubmitting}>
+            <button
+              className="primary-button"
+              type="submit"
+              disabled={workflowSubmitting || Object.keys(workflowFormErrors).length > 0}
+            >
               {workflowSubmitting ? "Creating..." : "Create Workflow"}
             </button>
           </form>

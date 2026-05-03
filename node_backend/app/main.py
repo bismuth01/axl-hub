@@ -43,6 +43,108 @@ ACTIVITY_TTL_SECONDS = int(os.getenv("ACTIVITY_TTL_SECONDS", "60"))
 CLIPBOARD_MAX_MESSAGES = int(os.getenv("CLIPBOARD_MAX_MESSAGES", "200"))
 STATE_PATH = Path(os.getenv("HUB_STATE_PATH", "data/hub_state.json"))
 
+API_HELP_ENDPOINTS = [
+    {
+        "method": "GET",
+        "path": "/health",
+        "description": "Health check for the node service.",
+    },
+    {
+        "method": "GET",
+        "path": "/topology",
+        "description": "Current topology snapshot including participants.",
+    },
+    {
+        "method": "GET",
+        "path": "/topology/participants",
+        "description": "List all participants.",
+    },
+    {
+        "method": "POST",
+        "path": "/topology/participants",
+        "description": "Create a participant.",
+    },
+    {
+        "method": "GET",
+        "path": "/workstations",
+        "description": "List workstations.",
+    },
+    {
+        "method": "POST",
+        "path": "/workstations",
+        "description": "Create a workstation.",
+    },
+    {
+        "method": "POST",
+        "path": "/workflows",
+        "description": "Create a workflow definition.",
+    },
+    {
+        "method": "GET",
+        "path": "/workflows/public",
+        "description": "List public workflows with discovery stats.",
+    },
+    {
+        "method": "GET",
+        "path": "/workflows/{workflow_id}",
+        "description": "Fetch a workflow by id.",
+    },
+    {
+        "method": "POST",
+        "path": "/execute",
+        "description": "Execute a workflow graph.",
+    },
+    {
+        "method": "GET",
+        "path": "/executions/{execution_id}",
+        "description": "Inspect an execution result.",
+    },
+    {
+        "method": "GET",
+        "path": "/clipboard",
+        "description": "Read recent clipboard messages.",
+    },
+]
+
+WORKFLOW_PIPELINE_GUIDE = {
+    "goal": "Chain workflow outputs into downstream workflow inputs.",
+    "reference_format": "$node.<NODE_ID>.output.<path.to.key>",
+    "example": {
+        "nodes": [
+            {
+                "id": "A",
+                "workflow_id": "chainlink-price-fetcher",
+                "params": {"coin": "btc"},
+            },
+            {
+                "id": "B",
+                "workflow_id": "email-send",
+                "params": {
+                    "email": "siddharthaswarnkar@gmail.com",
+                    "content": "$node.A.output.price",
+                },
+            },
+        ],
+        "edges": [
+            {
+                "from_id": "A",
+                "to_id": "B",
+                "condition": "true",
+            }
+        ],
+    },
+    "execution_flow": [
+        "Node A runs first and produces output, for example {\"price\": 65432.5}.",
+        "Node B resolves $node.A.output.price before execution.",
+        "The resolved value is passed into Node B as its content parameter.",
+    ],
+    "supported_patterns": [
+        "Use $node.A.output.price for a single field.",
+        "Use $node.A.output.data.nested.key for nested output objects.",
+        "Use edge conditions to gate execution, such as true or $node.A.output.price > 1000.",
+    ],
+}
+
 
 class ParticipantCreate(BaseModel):
     id: str = Field(min_length=1)
@@ -903,12 +1005,37 @@ class HubStore:
         with self.lock:
             return self._cleanup_stale_executions_locked()
 
+    def _get_coin_price(self, coin: str) -> float | None:
+        """Get simulated price for a coin (BTC, ETH, DAI, LINK)."""
+        coin_lower = str(coin).lower()
+        prices = {
+            "btc": 65432.50,
+            "eth": 3421.75,
+            "dai": 1.00,
+            "link": 28.45,
+        }
+        return prices.get(coin_lower)
+
+    def _send_email(self, email: str, content: str) -> dict[str, Any]:
+        """Simulate sending an email. Returns success."""
+        # In production, this would call a real email service (SendGrid, AWS SES, etc.)
+        # For now, we just log it and return success
+        print(f"[EMAIL] To: {email} | Content: {content[:100]}")
+        return {
+            "success": True,
+            "message_id": f"msg_{uuid4().hex[:8]}",
+            "recipient": email,
+        }
+
     def _call_adapter(self, workflow: dict[str, Any], input_payload: dict[str, Any]) -> dict[str, Any]:
         etype = workflow.get("execution_type")
         endpoint = workflow.get("endpoint")
+        workflow_id = workflow.get("id")
+        
         # local adapter: echo input as output
         if etype == "local" or etype is None:
             return {"status": "completed", "output": input_payload}
+        
         if etype == "http":
             if not endpoint:
                 return {"status": "failed", "error": "no endpoint configured"}
@@ -924,10 +1051,35 @@ class HubStore:
                     return {"status": "completed", "output": parsed}
             except urllib.error.URLError as exc:
                 return {"status": "failed", "error": str(exc)}
+        
         if etype == "keeperhub":
-            # MVP: simulate KeeperHub by returning input with a proof id
+            # KeeperHub adapter: simulate known workflows with realistic data
             proof = uuid4().hex
-            return {"status": "completed", "output": input_payload, "proof": proof}
+            output = input_payload
+            
+            # Chainlink price fetcher: return price for the requested coin
+            if workflow_id == "chainlink-price-fetcher":
+                coin = input_payload.get("coin")
+                if coin:
+                    price = self._get_coin_price(coin)
+                    if price is not None:
+                        output = {"price": price}
+                    else:
+                        return {"status": "failed", "error": f"unsupported coin: {coin}"}
+                else:
+                    return {"status": "failed", "error": "coin parameter required"}
+            
+            # Email send: simulate sending an email
+            elif workflow_id == "email-send":
+                email = input_payload.get("email")
+                content = input_payload.get("content")
+                if not email or not content:
+                    return {"status": "failed", "error": "email and content parameters required"}
+                result = self._send_email(str(email), str(content))
+                output = result
+            
+            return {"status": "completed", "output": output, "proof": proof}
+        
         return {"status": "failed", "error": "unsupported execution_type"}
 
     def _workflow_pricing(self, workflow: dict[str, Any]) -> dict[str, Any]:
@@ -1381,6 +1533,20 @@ app.add_middleware(
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/help")
+def help_endpoints() -> dict[str, Any]:
+    return {
+        "service": "AXL Hub Node",
+        "version": app.version,
+        "endpoints": API_HELP_ENDPOINTS,
+    }
+
+
+@app.get("/help-workflow")
+def help_workflow() -> dict[str, Any]:
+    return WORKFLOW_PIPELINE_GUIDE
 
 
 @app.get("/topology")
