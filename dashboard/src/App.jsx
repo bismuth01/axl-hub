@@ -80,7 +80,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [topology, setTopology] = useState({ participants: [] });
-  const [workstations, setWorkstations] = useState([]);
   const [publicWorkflows, setPublicWorkflows] = useState([]);
   const [clipboard, setClipboard] = useState({ max_messages: 0, messages: [] });
   const [executionDetails, setExecutionDetails] = useState(null);
@@ -124,20 +123,18 @@ function App() {
 
     const load = async () => {
       try {
-        const [topologyRes, workstationsRes, clipboardRes, workflowsRes] = await Promise.all([
+        const [topologyRes, clipboardRes, workflowsRes] = await Promise.all([
           fetch(`${BASE_URL}/topology`),
-          fetch(`${BASE_URL}/workstations`),
           fetch(`${BASE_URL}/clipboard`),
           fetch(`${BASE_URL}/workflows/public`),
         ]);
 
-        if (!topologyRes.ok || !workstationsRes.ok || !clipboardRes.ok || !workflowsRes.ok) {
+        if (!topologyRes.ok || !clipboardRes.ok || !workflowsRes.ok) {
           throw new Error("One or more API calls failed");
         }
 
-        const [topologyData, workstationsData, clipboardData, workflowsData] = await Promise.all([
+        const [topologyData, clipboardData, workflowsData] = await Promise.all([
           topologyRes.json(),
-          workstationsRes.json(),
           clipboardRes.json(),
           workflowsRes.json(),
         ]);
@@ -147,7 +144,6 @@ function App() {
         }
 
         setTopology(topologyData);
-        setWorkstations(workstationsData.workstations || []);
         setClipboard(clipboardData);
         setPublicWorkflows(workflowsData.workflows || []);
         setError("");
@@ -172,10 +168,7 @@ function App() {
     };
   }, []);
 
-  const activeAccessCount = useMemo(
-    () => workstations.reduce((acc, workstation) => acc + workstation.active_accesses.length, 0),
-    [workstations]
-  );
+  
 
   const workflowCount = publicWorkflows.length;
   const publicSuccessAverage = useMemo(() => {
@@ -402,10 +395,7 @@ function App() {
           <h2>Public Workflows</h2>
           <strong>{workflowCount}</strong>
         </article>
-        <article className="stat-card">
-          <h2>Active Accesses</h2>
-          <strong>{activeAccessCount}</strong>
-        </article>
+        
         <article className="stat-card">
           <h2>Average Success Rate</h2>
           <strong>{Math.round(publicSuccessAverage * 100)}%</strong>
@@ -715,31 +705,7 @@ function App() {
           </div>
         </section>
 
-        <section className="panel">
-          <h2>Workstations</h2>
-          <div className="workstation-list">
-            {workstations.map((workstation) => (
-              <article key={workstation.id} className="workstation-card">
-                <header>
-                  <h3>{workstation.name}</h3>
-                  <span className="mono">{workstation.id}</span>
-                </header>
-                <p>{workstation.description || "No description"}</p>
-                <p className="meta">Active accesses: {workstation.active_accesses.length}</p>
-                <ul>
-                  {workstation.active_accesses.map((access) => (
-                    <li key={`${workstation.id}-${access.participant_id}`}>
-                      <span className="mono">{access.participant_id}</span>
-                      <span>{fmtTimestamp(access.seen_at)}</span>
-                    </li>
-                  ))}
-                  {workstation.active_accesses.length === 0 && <li>No active access currently.</li>}
-                </ul>
-              </article>
-            ))}
-            {workstations.length === 0 && <p>No workstations created yet.</p>}
-          </div>
-        </section>
+        
 
         <section className="panel panel-wide">
           <h2>Clipboard</h2>
