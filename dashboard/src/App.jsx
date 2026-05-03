@@ -1,10 +1,21 @@
 import { useEffect, useMemo, useState } from "react";
 
 function normalizeBaseUrl(value) {
-  const fallback = "http://127.0.0.1:8000";
+  const fallback = import.meta.env.PROD ? "/api" : "http://127.0.0.1:8000";
   const raw = String(value || fallback).trim().replace(/\/+$/, "");
 
+  if (!raw) {
+    return fallback;
+  }
+
+  if (raw.startsWith("/")) {
+    return raw;
+  }
+
   if (/^https?:\/\//i.test(raw)) {
+    if (import.meta.env.PROD && raw.startsWith("http://")) {
+      return "/api";
+    }
     return raw;
   }
 
@@ -13,7 +24,7 @@ function normalizeBaseUrl(value) {
     return `${protocol}${raw}`;
   }
 
-  return `http://${raw}`;
+  return import.meta.env.PROD ? "/api" : `http://${raw}`;
 }
 
 const BASE_URL = normalizeBaseUrl(import.meta.env.VITE_NODE_BASE_URL);
