@@ -40,6 +40,8 @@ Set with environment variables:
 - `CLIPBOARD_MAX_MESSAGES` (default: `200`)
 - `HUB_STATE_PATH` (default: `data/hub_state.json`)
 - `X402_FACILITATOR_URL` (optional: off-chain facilitator URL for x402 verification / settlement)
+- `FACILITATOR_URL` (same as above; use this if your deployment platform prefers a shorter env var name)
+- x402 payments are enforced for `base-sepolia` only
 - `EXECUTION_STALE_SECONDS` (default: `600`)
 
 ## Run

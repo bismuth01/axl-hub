@@ -943,13 +943,21 @@ class HubStore:
     def _facilitator_url(self) -> str | None:
         return os.getenv("X402_FACILITATOR_URL") or os.getenv("FACILITATOR_URL")
 
+    def _x402_network(self, workflow: dict[str, Any]) -> str:
+        pricing = self._workflow_pricing(workflow)
+        x402 = pricing.get("x402") or {}
+        requested_network = str(x402.get("network") or "base-sepolia").strip().lower()
+        if requested_network and requested_network != "base-sepolia":
+            raise HTTPException(status_code=400, detail="x402 payments are supported only on base-sepolia")
+        return "base-sepolia"
+
     def _build_x402_requirements(self, workflow: dict[str, Any], node_id: str) -> dict[str, Any]:
         pricing = self._workflow_pricing(workflow)
         x402 = pricing.get("x402") or {}
         resource = x402.get("resource") or f"/execute/{node_id}"
         return {
             "scheme": x402.get("scheme", "exact"),
-            "network": x402.get("network", "base-sepolia"),
+            "network": self._x402_network(workflow),
             "asset": x402.get("asset") or x402.get("token_address") or x402.get("token"),
             "max_amount_required": str(x402.get("price", "0")),
             "resource": resource,
